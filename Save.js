@@ -39,6 +39,7 @@
 	
 	function savelocal(fdata){
 		var link = document.createElement('a');
+		link.target = "_blank";
 		fdata.forEach(function(fobj){
 			var evt = document.createEvent("HTMLEvents");
 			evt.initEvent("click");
