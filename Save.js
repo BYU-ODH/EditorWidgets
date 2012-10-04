@@ -1,7 +1,5 @@
-(function(){
-	if(typeof window.EditorWidgets !== 'object'){
-		window.EditorWidgets = {};
-	}
+var EditorWidgets
+(function(EditorWidgets){
 	
 	function buildPart(fobj) {
 		return 'Content-Disposition: form-data; name="'
@@ -11,14 +9,26 @@
 			+ fobj.data + '\r\n';
 	}
 	
-	function saveserver(fdata, target, success, error){
-		var i = 0, boundary,
-			xhr = new XMLHttpRequest(),
+	function buildPost(fdata){
+		var i = 0, boundary, pboundary,
 			parts = fdata.map(buildPart);
 		
 		do{ boundary = (++i + Date.now()).toString(36); }
 		while(parts.some(function(part){ return part.indexOf(boundary) >= 0; }));
+		pboundary = "--" + boundary;
 		
+		return {
+			'content-type': "multipart/form-data; boundary=" + boundary,
+			body:	pboundary + "\r\n"
+					+ parts.join(pboundary + "\r\n")
+					+ pboundary + "--\r\n"
+		};
+	}
+	
+	function savePost(fdata, target, success, error){
+		var xhr = new XMLHttpRequest(),
+			post = buildPost(fdata);
+			
 		if(typeof success !== 'function'){ success = function(){}; }
 		if(typeof error !== 'function'){ error = function(){}; }
 		xhr.onreadystatechange = function(){
@@ -26,30 +36,15 @@
 				((this.status >= 200 && this.status < 400)?success:error)(this.responseText);
 			}
 		};
-		
 		xhr.open("POST",target,true);
-		xhr.setRequestHeader("Content-type","multipart/form-data; boundary=" + boundary);
-		boundary = "--"+boundary;
-		xhr.send(
-			boundary + "\r\n"
-			+ parts.join(boundary + "\r\n")
-			+ boundary + "--\r\n"
-		);
+		xhr.setRequestHeader("Content-type",post['content-type']);
+		xhr.send(post.body);
 	}
 	
-	function savelocal(fdata){
-		var link = document.createElement('a');
-		link.target = "_blank";
-		fdata.forEach(function(fobj){
-			var evt = document.createEvent("HTMLEvents");
-			evt.initEvent("click");
-			link.download = fobj.name;
-			link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
-			link.dispatchEvent(evt);
-		});
+	function Save(fdata, target, success, error){
+		(Save.targets.hasOwnProperty(target)?Save.targets[target]:savePost)(fdata, target, success, error);
 	}
+	Save.targets = {};
 
-	EditorWidgets.Save = function(fdata, target, success, error){
-		(target === 'file'?savelocal:saveserver)(fdata, target, success, error);
-	};
-})();
+	EditorWidgets.Save = Save;
+})(EditorWidgets || {});
