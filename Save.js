@@ -47,4 +47,4 @@ var EditorWidgets
 	Save.targets = {};
 
 	EditorWidgets.Save = Save;
-})(EditorWidgets || {});
+})(EditorWidgets || (EditorWidgets = {}));

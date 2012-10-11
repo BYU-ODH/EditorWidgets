@@ -5,6 +5,13 @@
 	EditorWidgets.CommandStack = function() {
 		var unstack = [],
 			restack = [];
+		/* Command object structure:
+		 * context: the value of 'this' for undo/redo calls
+		 * undo: the function to call to undo
+		 * redo: the function to call to redo
+		 * file: an identifier that allows removing commands from the stack
+		 *	(e.g., if the file they relate to is closed)
+		 */
 		this.push = function(com){
 			unstack.push(com);
 			restack = []; //erase redo stack
@@ -25,5 +32,10 @@
 				c.redo.call(c.context);
 			}
 		};
+		this.removeEvents = function(name){
+			function f(e){ return e.file !== name; }
+			unstack = unstack.filter(f);
+			restack = restack.filter(f);
+		}
 	};
 })();
