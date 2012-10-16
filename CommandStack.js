@@ -37,5 +37,10 @@
 			unstack = unstack.filter(f);
 			restack = restack.filter(f);
 		}
+		this.renameEvents = function(o,n){
+			function f(e){ if(e.file === o){ e.file = n; } }
+			unstack.forEach(f);
+			restack.forEach(f);
+		}
 	};
 })();

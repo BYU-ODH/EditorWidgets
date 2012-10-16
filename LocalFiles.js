@@ -59,7 +59,7 @@ var EditorWidgets
 						a = document.createElement('a');
 						a.style.display = "block";
 						a.href = "#";
-						a['data-key'] = key
+						a['data-key'] = key;
 						a.innerText = key.substr(5);
 						a.addEventListener('click',function(){
 							root.parentNode.removeChild(root);
