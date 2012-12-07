@@ -8,12 +8,12 @@ var EditorWidgets
 				window.open("data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data),'_blank');
 			});
 		}):(function(){
-			var link = document.createElement('a'),
-				evt = document.createEvent("HTMLEvents");
+			var link = document.createElement('a');
 			link.target = "_blank";
-			evt.initEvent("click",false,false);
 			return function(fdata){
 				fdata.forEach(function(fobj){
+					var evt = document.createEvent("HTMLEvents");
+					evt.initEvent("click",false,false);
 					link.download = fobj.name;
 					link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
 					link.dispatchEvent(evt);
