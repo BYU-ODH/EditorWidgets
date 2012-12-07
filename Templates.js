@@ -34,7 +34,7 @@ var EditorWidgets
 	}
 	
 	processTemplate.Dialog = function(title, template, config, cb){
-		var dialog, dt = dialogTemplate.cloneNode(true);
+		var dialog, wrapper, dt = dialogTemplate.cloneNode(true);
 		dt.appendChild(getRootElement(template));
 		
 		if(!config.dialog_bar){
@@ -45,7 +45,7 @@ var EditorWidgets
 		}
 		if(!config.close_btn){
 			config.close_btn = function(root){
-				this.addEventListener('click',function(){ root.parentNode.removeChild(root); },false);
+				this.addEventListener('click',function(){ wrapper.close(); },false);
 			};
 		}
 		
@@ -53,11 +53,17 @@ var EditorWidgets
 		if(!dialog.style.top){ dialog.style.top = (Math.random()*50+10)+"%"; }
 		if(!dialog.style.left){ dialog.style.left = (Math.random()*50+10)+"%"; }
 		document.body.appendChild(dialog);
-		return {
+		return (wrapper = {
 			dialog: dialog,
-			close: function(){ dialog.parentNode.removeChild(dialog); }, 
+			close: function(){
+				if(this.onBeforeClose){
+					if(!this.onBeforeClose()){ return; }
+				}
+				dialog.parentNode.removeChild(dialog);
+				if(this.onClose){ this.onClose(); }
+			}, 
 			show: function(){ document.body.appendChild(dialog); }
-		};
+		});
 	};
 	
 	EditorWidgets.Template = processTemplate;

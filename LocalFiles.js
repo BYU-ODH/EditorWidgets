@@ -1,7 +1,6 @@
 var EditorWidgets
 (function(EditorWidgets){
 	var Save = EditorWidgets.Save,
-		fileDialogTemplate = '<input type="file" data-template-key="filepicker" />',
 		storageDialogTemplate = '<div data-template-key="filelist" style="padding:0 20px 20px 20px;min-width:150px;max-height: 150px;overflow: auto;"></div>';
 
 	var saveFile = (navigator.userAgent.indexOf("Firefox")!==-1)?(function(fdata){
@@ -21,34 +20,32 @@ var EditorWidgets
 				});
 			}
 		}());
-	saveFile.label = "Save to File";
+	saveFile.label = "To Disk";
 	
 	function saveStorage(fdata){
 		fdata.forEach(function(fobj){ localStorage["file:"+fobj.name] = JSON.stringify(fobj); });
 	}
-	saveStorage.label = "Save to Browser Storage";
+	saveStorage.label = "To Browser Storage";
 	
 	function fileDialog(exp,cb){ //show file picker dialog
-		EditorWidgets.Template.Dialog("Choose File",fileDialogTemplate,{
-			filepicker: function(root){
-				this.addEventListener('change',function(evt){
-					var file = evt.target.files[0],
-						reader = new FileReader();
-					reader.onload = function(evt){
-						root.parentNode.removeChild(root);
-						cb({
-							name: file.name,
-							mime: file.type,
-							data: evt.target.result
-						});
-					};
-					reader.onerror = function(e){alert("Error Reading File:\n" + e.message);};
-					reader.readAsText(file);
+		var f = document.createElement('input');
+		f.type = "file";
+		f.addEventListener('change',function(evt){
+			var file = evt.target.files[0],
+				reader = new FileReader();
+			reader.onload = function(evt){
+				cb({
+					name: file.name,
+					mime: file.type,
+					data: evt.target.result
 				});
-			}
+			};
+			reader.onerror = function(e){alert("Error Reading File:\n" + e.message);};
+			reader.readAsText(file);
 		});
+		f.click();
 	}
-	fileDialog.label = "Read File";
+	fileDialog.label = "From Disk";
 	
 	function storageDialog(exp,cb){ //show storage key picker dialog
 		EditorWidgets.Template.Dialog("Choose File", storageDialogTemplate,{
@@ -60,7 +57,7 @@ var EditorWidgets
 						a.style.display = "block";
 						a.href = "#";
 						a['data-key'] = key;
-						a.innerText = key.substr(5);
+						a.textContent = key.substr(5);
 						a.addEventListener('click',function(){
 							root.parentNode.removeChild(root);
 							cb(JSON.parse(localStorage[this['data-key']]));
@@ -71,7 +68,7 @@ var EditorWidgets
 			}
 		});
 	}
-	storageDialog.label = "Read Browser Storage";
+	storageDialog.label = "From Browser Storage";
 	
 	function LocalFile(loc,exp,cb){ (LocalFile.sources.hasOwnProperty(loc)?LocalFile.sources[loc]:fileDialog)(exp,cb); }
 	LocalFile.sources = {

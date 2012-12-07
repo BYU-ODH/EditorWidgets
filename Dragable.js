@@ -7,16 +7,25 @@ var EditorWidgets
 	ae = null; //active element
 	
 	function Dragable(element, handle, config){
-		var p, maxt, mint, maxl, minl;
+		var p, min;
 		if(!config){ config = {}; }
 		for(p in props){
 			this[p] = (config.hasOwnProperty(p)?config:props)[p];
 		}
 		this.element = element;
-		minl = Math.max(this.minLeft,0);
-		mint = Math.max(this.minTop,0);
-		element.style.left = (Math.random()*(Math.min(this.maxLeft,document.body.offsetWidth || window.clientWidth) - minl)+minl) + 'px';
-		element.style.top = (Math.random()*(Math.min(this.maxTop,document.body.offsetHeight || window.clientHeight) - mint)+mint) + 'px';
+		if(config.x){
+			element.style.left = Math.min(Math.max(config.x,this.minLeft),this.maxLeft)+'px';
+		}else{
+			min = Math.max(this.minLeft,0);
+			element.style.left = (Math.random()*(Math.min(this.maxLeft,document.body.offsetWidth || window.clientWidth) - min)+min) + 'px';
+		}
+		if(config.y){
+			element.style.top = Math.min(Math.max(config.y,this.minTop),this.maxTop)+'px';
+		}else{
+			min = Math.max(this.minTop,0);
+			element.style.top = (Math.random()*(Math.min(this.maxTop,document.body.offsetHeight || window.clientHeight) - min)+min) + 'px';
+		}
+		
 		handle.addEventListener('mousedown',mouseDown.bind(this), false);
 	}
 	
