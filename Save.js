@@ -45,6 +45,9 @@ var EditorWidgets
 		(Save.targets.hasOwnProperty(target)?Save.targets[target]:savePost)(fdata, target, success, error);
 	}
 	Save.targets = {};
+	Save.targetIsURL = function(target){
+		return !Save.targets.hasOwnProperty(target);
+	}
 
 	EditorWidgets.Save = Save;
 })(EditorWidgets || (EditorWidgets = {}));

@@ -56,7 +56,8 @@
 					saveIndex = b?unstack.length:-1;
 					return b;
 				},
-				enumerable:true}
+				enumerable:true
+			}
 		});
 	};
 	
