@@ -59,8 +59,10 @@ var EditorWidgets
 				if(this.onBeforeClose){
 					if(!this.onBeforeClose()){ return; }
 				}
-				dialog.parentNode.removeChild(dialog);
-				if(this.onClose){ this.onClose(); }
+				if(dialog.parentNode){
+					dialog.parentNode.removeChild(dialog);
+					if(this.onClose){ this.onClose(); }
+				}
 			}, 
 			show: function(){ document.body.appendChild(dialog); }
 		});
