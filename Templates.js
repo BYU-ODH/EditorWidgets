@@ -13,58 +13,92 @@ var EditorWidgets
 			root = document.createElement('span');
 			root.innerHTML = t;
 		}else{ root = t.cloneNode(true); }
-		return (root.children.length === 1)?root.firstChild:root;
+		return (root.childNodes.length === 1)?root.firstChild:root;
 	}
 	
-	function processTemplate(template, config, cb){
-		var nodes = [], attrs = {}, n, root, key;
-		n = root = getRootElement(template);
-		do {
-			if(n.nodeType === Node.ELEMENT_NODE){
-				Array.prototype.push.apply(nodes,n.childNodes);
-				key = n.getAttribute('data-template-key');
-				if(key){
-					config.hasOwnProperty(key) && config[key].call(n,root);
-					attrs[key] = n;
-				}
+	function processTemplate(template, config){
+		var nodes = [], attrs = {}, events,
+			root = getRootElement(template),
+			elements = config.elements||{},
+			rconf = config.root||{};
+		[].forEach.call(root.querySelectorAll('[data-template-key]'),function(n){
+			var econf, key = n.getAttribute('data-template-key');
+			attrs[key] = n;
+			if(!elements.hasOwnProperty(key)){ return; }
+			econf = elements[key];
+			if(typeof econf.init === 'function'){ econf.init.call(n,root); }
+			if(econf.hasOwnProperty('events')){
+				events = econf.events;
+				Object.keys(events).forEach(function(event){
+					n.addEventListener(event,events[event],false);
+				});
 			}
-		}while(n = nodes.pop());
-		cb && cb(root, attrs);
+		});
+		if(typeof rconf.finalize === 'function'){ rconf.finalize(root, attrs); }
+		if(rconf.hasOwnProperty('events')){
+			events = rconf.events;
+			Object.keys(events).forEach(function(event){
+				root.addEventListener(event,events[event],false);
+			});
+		}
 		return root;
 	}
 	
-	processTemplate.Dialog = function(title, template, config, cb){
-		var dialog, wrapper, dt = dialogTemplate.cloneNode(true);
-		dt.appendChild(getRootElement(template));
+	processTemplate.Dialog = function(title, template, config){
+		var dialog, wrapper, events,
+			rconf = config.root||{},
+			parent = config.parent||document.body,
+			style = config.style;
 		
-		if(!config.dialog_bar){
-			config.dialog_bar = function(root){ EditorWidgets.Dragable && (new EditorWidgets.Dragable(root,this,config)); };
+		dialog = processTemplate(dialogTemplate,{
+			elements: {
+				dialog_bar: {
+					init: function(root){ EditorWidgets.Dragable && (new EditorWidgets.Dragable(root,this,config)); }
+				},
+				dialog_title: {
+					init: function(root){ this.innerHTML = title; }
+				},
+				close_btn: {
+					events: { click: function(){ wrapper.close(); } }
+				},
+			}
+		});
+				
+		if(typeof style === 'object'){
+			Object.keys(style).forEach(function(pname){
+				dialog.style[pname] = style[pname];
+			});
 		}
-		if(!config.dialog_title){
-			config.dialog_title = function(root){ this.innerHTML = title; };
-		}
-		if(!config.close_btn){
-			config.close_btn = function(root){
-				this.addEventListener('click',function(){ wrapper.close(); },false);
-			};
+		if(rconf.hasOwnProperty('events')){
+			events = rconf.events;
+			Object.keys(events).forEach(function(event){
+				dialog.addEventListener(event,events[event],false);
+			});
 		}
 		
-		dialog = processTemplate(dt,config, cb);
+		processTemplate(template, {
+			root: {
+				finalize: function(root,attrs){
+					dialog.appendChild(root);
+					if(typeof rconf.finalize === 'function'){ rconf.finalize(dialog,attrs); }
+				}
+			},
+			elements:config.elements
+		});
+		
 		if(!dialog.style.top){ dialog.style.top = (Math.random()*50+10)+"%"; }
 		if(!dialog.style.left){ dialog.style.left = (Math.random()*50+10)+"%"; }
-		document.body.appendChild(dialog);
+		
+		if(config.autoshow){ parent.appendChild(dialog); }
+		
 		return (wrapper = {
 			dialog: dialog,
+			show: function(){ if(dialog.parentNode !== parent){ parent.appendChild(dialog); } },
 			close: function(){
-				if(this.onBeforeClose){
-					if(!this.onBeforeClose()){ return; }
-				}
-				if(dialog.parentNode){
-					dialog.parentNode.removeChild(dialog);
-					if(this.onClose){ this.onClose(); }
-				}
-			}, 
-			show: function(){ document.body.appendChild(dialog); }
+				if(!dialog.parentNode){ return; }
+				dialog.parentNode.removeChild(dialog);
+				if(this.onClose){ this.onClose(); }
+			}
 		});
 	};
 	
