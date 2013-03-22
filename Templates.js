@@ -44,8 +44,9 @@ var EditorWidgets
 		return root;
 	}
 	
-	processTemplate.Dialog = function(title, template, config){
-		var dialog, wrapper, events,
+	function Dialog(title, template, config){
+		if(!(this instanceof Dialog)){ return new Dialog(title, template, config); }
+		var dialog, events, that = this,
 			rconf = config.root||{},
 			parent = config.parent||document.body,
 			style = config.style;
@@ -59,7 +60,7 @@ var EditorWidgets
 					init: function(root){ this.innerHTML = title; }
 				},
 				close_btn: {
-					events: { click: function(){ wrapper.close(); } }
+					events: { click: function(){ that.close(); } }
 				},
 			}
 		});
@@ -89,18 +90,45 @@ var EditorWidgets
 		if(!dialog.style.top){ dialog.style.top = (Math.random()*50+10)+"%"; }
 		if(!dialog.style.left){ dialog.style.left = (Math.random()*50+10)+"%"; }
 		
-		if(config.autoshow){ parent.appendChild(dialog); }
+		if(config.blockKeys){
+			dialog.addEventListener('keydown',function(e){
+				e = e||window.event;
+				switch(e.keyCode){
+					case 89: //undo and redo keys
+					case 90:
+						if(e.ctrlKey){ e.preventDefault(); }
+					default: e.stopPropagation();
+					break;
+				}
+			},false);
+		}
 		
-		return (wrapper = {
-			dialog: dialog,
-			show: function(){ if(dialog.parentNode !== parent){ parent.appendChild(dialog); } },
-			close: function(){
-				if(!dialog.parentNode){ return; }
-				dialog.parentNode.removeChild(dialog);
-				if(this.onClose){ this.onClose(); }
+		this.dialog = dialog;
+		this.show = function(){
+			var rect, bottom, height, right, width;
+			if(dialog.parentNode !== parent){
+				parent.appendChild(dialog);
+				rect = dialog.getBoundingClientRect();
+				bottom = rect.bottom;
+				height = window.innerHeight;
+				if(bottom > height){
+					dialog.style.top = (dialog.offsetTop - bottom + height) + "px";
+				}
+				right = rect.right;
+				width = window.innerWidth;
+				if(right > width){
+					dialog.style.left = (dialog.offsetLeft - right + width) + "px";
+				}
 			}
-		});
+		};
+		
+		if(config.autoshow){ this.show(); }
+	}
+	Dialog.prototype.close = function(){
+		if(!this.dialog.parentNode){ return; }
+		this.dialog.parentNode.removeChild(this.dialog);
 	};
 	
+	processTemplate.Dialog = Dialog;
 	EditorWidgets.Template = processTemplate;
 })(EditorWidgets || (EditorWidgets = {}));

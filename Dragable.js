@@ -30,8 +30,8 @@ var EditorWidgets
 	}
 	
 	function mouseDown(e){
-		this.ex = parseInt(this.element.style.left,10);
-		this.ey = parseInt(this.element.style.top,10);
+		this.ex = this.element.offsetLeft;
+		this.ey = this.element.offsetTop;
 		this.mx = e.pageX || e.clientX + document.documentElement.scrollLeft;
 		this.my = e.pageY || e.clientY + document.documentElement.scrollTop;
 		ae = this;
@@ -42,7 +42,7 @@ var EditorWidgets
 	document.addEventListener('mousemove', function(e){
 		if(!ae){ return; }
 		var mx = e.pageX || e.clientX + document.documentElement.scrollLeft,
-			my = e.pageY || e.clientY + document.documentElement.scrollLeft;
+			my = e.pageY || e.clientY + document.documentElement.scrollTop;
 		ae.element.style.left = Math.max(Math.min(ae.ex + mx - ae.mx, ae.maxLeft), ae.minLeft) + 'px';
 		ae.element.style.top = Math.max(Math.min(ae.ey + my - ae.my, ae.maxTop), ae.minTop) + 'px';
 		e.preventDefault();
