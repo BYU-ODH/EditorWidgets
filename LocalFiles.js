@@ -1,25 +1,25 @@
 var EditorWidgets
 (function(EditorWidgets){
-	var Save = EditorWidgets.Save,
+	var Save = EditorWidgets.Save, saveFile,
 		storageDialogTemplate = '<div data-template-key="filelist" style="padding:0 20px 20px 20px;min-width:150px;max-height: 150px;overflow: auto;"></div>';
 
-	var saveFile = (navigator.userAgent.indexOf("Firefox")!==-1)?(function(fdata){
+	saveFile = (navigator.userAgent.indexOf("Firefox")!==-1)?(function(fdata){
+		fdata.forEach(function(fobj){
+			window.open("data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data),'_blank');
+		});
+	}):(function(){
+		var link = document.createElement('a');
+		link.target = "_blank";
+		return function(fdata){
 			fdata.forEach(function(fobj){
-				window.open("data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data),'_blank');
+				var evt = document.createEvent("HTMLEvents");
+				evt.initEvent("click",false,false);
+				link.download = fobj.name;
+				link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
+				link.dispatchEvent(evt);
 			});
-		}):(function(){
-			var link = document.createElement('a');
-			link.target = "_blank";
-			return function(fdata){
-				fdata.forEach(function(fobj){
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent("click",false,false);
-					link.download = fobj.name;
-					link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
-					link.dispatchEvent(evt);
-				});
-			}
-		}());
+		}
+	}());
 	saveFile.label = "To Disk";
 	
 	function saveStorage(fdata){

@@ -9,6 +9,8 @@ var EditorWidgets
 	function Dragable(element, handle, config){
 		var p, min;
 		if(!config){ config = {}; }
+		this.minTop = this.minLeft = -1/0;
+		this.maxTop = this.maxLeft = 1/0;
 		for(p in props){
 			this[p] = (config.hasOwnProperty(p)?config:props)[p];
 		}
