@@ -93,6 +93,12 @@
 			var fobj = filemap[fname];
 			return fobj?(fobj.saveIndex === fobj.unstack.length):true;
 		};
+
+		this.setFileSaved = function(fname){
+			var fobj = filemap[fname];
+			if(!fobj){ return; }
+			fobj.saveIndex = fobj.unstack.length;
+		};
 		
 		this.fileUndoDepth = function(fname){
 			var fobj = filemap[fname];
