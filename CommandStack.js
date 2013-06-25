@@ -124,7 +124,7 @@
 				set: function(v){
 					v = !!v;
 					Object.keys(filemap).forEach(
-					b?function(fname){
+					v?function(fname){
 						var fobj = filemap[fname];
 						fobj.saveIndex = fobj.unstack.length;
 					}:function(fname){
