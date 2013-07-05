@@ -19,11 +19,9 @@ var EditorWidgets
 		return function(fdata,target,success,error){
 			try{
 				fdata.forEach(function(fobj){
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent("click",false,false);
 					link.download = fobj.name;
 					link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
-					link.dispatchEvent(evt);
+					link.dispatchEvent(new MouseEvent('click'));
 				});
 			}catch(e){
 				if(typeof error === 'function'){ error(e); }
