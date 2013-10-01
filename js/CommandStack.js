@@ -38,7 +38,7 @@
 				fobj.restack = [];
 				//check if a saved state is reachable
 				if(fobj.saveIndex >= fobj.unstack.length){
-					saveIndex = -1;
+					fobj.saveIndex = -1;
 				}
 			}
 		};
@@ -98,6 +98,16 @@
 			var fobj = filemap[fname];
 			if(!fobj){ return; }
 			fobj.saveIndex = fobj.unstack.length;
+		};
+
+		this.setFileUnsaved = function(fname){
+			if(!filemap.hasOwnProperty(fname)){
+				filemap[fname] = {
+					unstack: [],
+					restack: [],
+					saveIndex: -1
+				};
+			}else{ filemap[file].saveIndex = -1; }
 		};
 		
 		this.fileUndoDepth = function(fname){
