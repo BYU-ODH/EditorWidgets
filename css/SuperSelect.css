@@ -6,10 +6,6 @@
     transition: 0.4s ease height;
 }
 
-.superselect.open {
-    height: 330px;
-}
-
 .superselect > span {
     margin-right: 10px;
     font-style: italic;

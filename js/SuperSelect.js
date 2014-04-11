@@ -8,7 +8,7 @@
 			<select value={{selection}} style="display:none;" name="{{id}}" id="{{id}}" multiple="{{multiple}}">\
 				{{#options}}<option value="{{.value}}"></option>{{/options}}\
 			</select>\
-			<div class="{{open?"superselect open":"superselect"}}">\
+			<div class="superselect">\
 				<span>\
 				{{#options}}\
 					{{#checkSelected(.value,selection,multiple)}}<span class="badge badge-info pad-right-low">{{.text}}</span>{{/checkSelected}}\
