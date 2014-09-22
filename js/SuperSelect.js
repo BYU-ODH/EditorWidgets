@@ -5,21 +5,28 @@
 	
 	EditorWidgets.SuperSelect = Ractive.extend({
 		template: '<div style="display:inline-block;position:relative;">\
-			<select value={{selection}} style="display:none;" name="{{id}}" id="{{id}}" multiple="{{multiple}}">\
-				{{#options}}<option value="{{.value}}"></option>{{/options}}\
+			<select style="display:none;" name="{{id}}" id="{{id}}" multiple="{{multiple}}">\
+				{{#options}}<option value="{{.value}}" selected="{{checkSelected(.value, selection)}}"></option>{{/options}}\
 			</select>\
 			<div class="superselect">\
+				{{#(button === "left")}}<div>\
+					<button class="btn" proxy-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
+				</div>{{/button}}\
 				<span>\
-				{{#options}}\
-					{{#checkSelected(.value,selection,multiple)}}<span class="badge badge-info pad-right-low">{{.text}}</span>{{/checkSelected}}\
+				{{#options:i}}\
+					{{#checkSelected(.value,selection)}}\
+						<span class="badge badge-info pad-right-low">\
+							{{.text}} {{#multiple}}<span style="color: white; cursor: pointer;" proxy-tap="select:{{i}}">×</span>{{/multiple}}\
+						</span>\
+					{{/checkSelected}}\
 				{{/options}}\
 				{{^selection.length}}<span>Nothing selected</span>{{/selection.length}}\
 				</span>\
-				<div>\
+				{{^(button === "left")}}<div>\
 					<button class="btn" proxy-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
-				</div>\
+				</div>{{/button}}\
 			</div>\
-			<div class="superselectPopup" style="display:{{open?"block":"none"}};" proxy-tap="clickpopup">\
+			<div class="superselectPopup {{(button === "left"?"left":"right")}}" style="display:{{open?"block":"none"}};" proxy-tap="clickpopup">\
 				<div class="point"></div>\
 				<div class="point"></div>\
 				<div>\
@@ -28,7 +35,7 @@
 				<div class="optionListing">\
 					{{#options:i}}\
 					{{#filter(filterstr,.text)}}\
-					<div class="{{checkSelected(.value,selection,multiple)?"option selected":"option"}}" proxy-tap="select:{{i}}"><div class="check"></div>{{.text}}</div>\
+					<div class="{{checkSelected(.value,selection)?"option selected":"option"}}" proxy-tap="select:{{i}}"><div class="check"></div>{{.text}}</div>\
 					{{/filter}}\
 					{{/options}}\
 				</div>\
@@ -37,8 +44,8 @@
 		data: {
 			filterstr: "",
 			filter: function(str,text){ return text.toLowerCase().indexOf(str.toLowerCase()) > -1; },
-			checkSelected: function(optval,selval,multiple){
-				return multiple ? selval.indexOf(optval) > -1 : selval === optval;
+			checkSelected: function(optval,selval){
+				return ~selval.indexOf(optval);
 			}
 		},
 		init: function(options){
@@ -61,16 +68,21 @@
 				return false;
 			});
 			this.on('select',function(e,which){
-				var idx, selval = this.data.selection,
+				var sels = this.data.selection,
+					selopt = select.options[which],
 					optval = this.data.options[which].value;
 				if(this.data.multiple){
-					idx = selval.indexOf(optval);
-					if(idx === -1){ selval.push(optval); }
-					else{ selval.splice(idx,1); }
+					if(selopt.selected){
+						sels.splice(sels.indexOf(optval),1);
+					}else{
+						sels.push(optval);
+					}
 				}else{
-					this.set('selection',(selval === optval)?"":optval);
+					select.value = optval;
+					this.set('selection',(sels[0] === optval)?[]:[optval]);
 				}
 			});
+			
 			window.addEventListener("click", function(){ r.set('open',false); }, false);
 			document.addEventListener("keyup", function(e) {
 				if (e.keyCode === 27) { r.set('open',false); }
