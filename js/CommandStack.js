@@ -10,7 +10,8 @@
 				"": {
 					unstack: [],
 					restack: [],
-					saveIndex: 0
+					saveIndex: 0,
+					saveIndices: {}
 				}
 			};
 		/* Command object structure:
@@ -21,7 +22,7 @@
 		 *	(e.g., if the file they relate to is closed)
 		 */
 		this.push = function(com,file){
-			var fobj;
+			var fobj, indices, len;
 			if(typeof file !== 'string'){
 				file = com.file || "";
 			}
@@ -30,16 +31,20 @@
 				filemap[file] = {
 					unstack: [com],
 					restack: [],
-					saveIndex: 0
+					saveIndex: 0,
+					saveIndices: {}
 				};
 			}else{
 				fobj = filemap[file];
 				fobj.unstack.push(com);
 				fobj.restack = [];
+				len = fobj.unstack.length;
 				//check if a saved state is reachable
-				if(fobj.saveIndex >= fobj.unstack.length){
-					fobj.saveIndex = -1;
-				}
+				if(fobj.saveIndex >= len){ fobj.saveIndex = -1; }
+				indices = fobj.saveIndices;
+				Object.keys(indices).forEach(function(key){
+					if(indices[key] >= len){ indices[key] = -1; }
+				});
 			}
 		};
 		
@@ -89,25 +94,43 @@
 			return filemap.hasOwnProperty(fname);
 		};
 		
-		this.isFileSaved = function(fname){
+		this.isFileSaved = function(fname, loc){
 			var fobj = filemap[fname];
-			return fobj?(fobj.saveIndex === fobj.unstack.length):true;
+			if(fobj === void 0){ return true; }
+			return (loc === void 0?fobj.saveIndex:fobj.saveIndices[loc])
+				=== fobj.unstack.length;
 		};
 
-		this.setFileSaved = function(fname){
-			var fobj = filemap[fname];
-			if(!fobj){ return; }
-			fobj.saveIndex = fobj.unstack.length;
+		this.setFileSaved = function(fname, loc){
+			var fobj;
+			if(filemap.hasOwnProperty(fname)){
+				fobj = filemap[fname];
+			}else{
+				fobj = {
+					unstack: [],
+					restack: [],
+					saveIndex: -1,
+					saveIndices: {}
+				};
+				filemap[fname] = fobj;
+			}
+			if(loc === void 0){ fobj.saveIndex = fobj.unstack.length; }
+			else{ fobj.saveIndices[loc] = fobj.unstack.length; }
 		};
 
-		this.setFileUnsaved = function(fname){
+		this.setFileUnsaved = function(fname, loc){
 			if(!filemap.hasOwnProperty(fname)){
 				filemap[fname] = {
 					unstack: [],
 					restack: [],
-					saveIndex: -1
+					saveIndex: -1,
+					saveIndices: {}
 				};
-			}else{ filemap[file].saveIndex = -1; }
+			}else if(loc === void 0){
+				filemap[file].saveIndex = -1;
+			}else{
+				filemap[file].saveIndices[loc] = -1;
+			}
 		};
 		
 		this.fileUndoDepth = function(fname){
@@ -118,6 +141,25 @@
 		this.fileRedoDepth = function(fname){
 			var fobj = filemap[fname];
 			return fobj?fobj.restack.length:0;
+		};
+		
+		this.isSavedAt = function(loc){
+			return !Object.keys(filemap).some(function(fname){
+				var fobj = filemap[fname];
+				return fobj.unstack.length !== fobj.saveIndices[loc];
+			});
+		};
+		
+		this.setSavedAt = function(v, loc){
+			v = !!v;
+			Object.keys(filemap).forEach(
+			v?function(fname){
+				var fobj = filemap[fname];
+				fobj.saveIndices[loc] = fobj.unstack.length;
+			}:function(fname){
+				filemap[fname].saveIndices[loc] = -1;
+			});
+			return v;
 		};
 		
 		Object.defineProperties(this,{
