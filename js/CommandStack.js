@@ -6,14 +6,7 @@
 	EditorWidgets.CommandStack = function() {
 		var unstack = [],
 			restack = [],
-			filemap = {
-				"": {
-					unstack: [],
-					restack: [],
-					saveIndex: 0,
-					saveIndices: {}
-				}
-			};
+			filemap = {};
 		/* Command object structure:
 		 * context: the value of 'this' for undo/redo calls
 		 * undo: the function to call to undo
@@ -24,7 +17,7 @@
 		this.push = function(com,file){
 			var fobj, indices, len;
 			if(typeof file !== 'string'){
-				file = com.file || "";
+				file = com.file;
 			}
 			unstack.push(file);
 			if(!filemap.hasOwnProperty(file)){
