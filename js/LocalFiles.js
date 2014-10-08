@@ -30,7 +30,7 @@ var EditorWidgets
 			if(typeof success === 'function'){ success(fdata,target); }
 		}
 	}());
-	saveFile.label = "To Disk";
+	saveFile.label = "Disk";
 	
 	function saveStorage(fdata,target,success,error){
 		try{
@@ -41,7 +41,7 @@ var EditorWidgets
 		}
 		if(typeof success === 'function'){ success(fdata,target); }
 	}
-	saveStorage.label = "To Browser Storage";
+	saveStorage.label = "Browser Storage";
 	
 	function fileDialog(exp,success,error){ //show file picker dialog
 		var f = document.createElement('input');
@@ -61,7 +61,7 @@ var EditorWidgets
 		});
 		f.click();
 	}
-	fileDialog.label = "From Disk";
+	fileDialog.label = "Disk";
 	
 	function storageDialog(exp,success,error){ //show storage key picker dialog
 		EditorWidgets.Template.Dialog("Choose File", storageDialogTemplate,{
@@ -91,7 +91,7 @@ var EditorWidgets
 			}
 		});
 	}
-	storageDialog.label = "From Browser Storage";
+	storageDialog.label = "Browser Storage";
 	
 	function LocalFile(loc,exp,success,error){ (LocalFile.sources.hasOwnProperty(loc)?LocalFile.sources[loc]:fileDialog)(exp,success,error); }
 	LocalFile.sources = {
