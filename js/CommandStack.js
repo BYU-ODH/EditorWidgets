@@ -94,6 +94,14 @@
 				=== fobj.unstack.length;
 		};
 
+		this.getFileSavedLocations = function(fname){
+			var fobj = filemap[fname];
+			if(fobj === void 0){ return []; }
+			return Object.keys(fobj.saveIndices).filter(function(key){
+				return fobj.saveIndices[key] === fobj.unstack.length;
+			});
+		};
+		
 		this.setFileSaved = function(fname, loc){
 			var fobj;
 			if(filemap.hasOwnProperty(fname)){
