@@ -11,7 +11,7 @@ var EditorWidgets
 		}catch(e){
 			if(typeof error === 'function'){ error(e); }
 			return;
-		}		
+		}
 		if(typeof success === 'function'){ success(fdata,target); }
 	}):(function(){
 		var link = document.createElement('a');
@@ -31,18 +31,25 @@ var EditorWidgets
 		}
 	}());
 	saveFile.label = "Disk";
-	
+
 	function saveStorage(fdata,target,success,error){
 		try{
-			fdata.forEach(function(fobj){ localStorage["file:"+fobj.name] = JSON.stringify(fobj); });
+			fdata.forEach(function(fobj){
+				//reconstruct a new file object for safety,
+				//to strip out any extra crud that might be there
+				localStorage["file:"+fobj.name] = JSON.stringify({
+					name: fobj.name,
+					mime: fobj.mime,
+					data: fobj.data
+				});
+			});
+			if(typeof success === 'function'){ success(fdata,target); }
 		}catch(e){
 			if(typeof error === 'function'){ error(e); }
-			return;
 		}
-		if(typeof success === 'function'){ success(fdata,target); }
 	}
 	saveStorage.label = "Browser Storage";
-	
+
 	function fileDialog(exp,success,error){ //show file picker dialog
 		var f = document.createElement('input');
 		f.type = "file";
@@ -62,7 +69,7 @@ var EditorWidgets
 		f.click();
 	}
 	fileDialog.label = "Disk";
-	
+
 	function storageDialog(exp,success,error){ //show storage key picker dialog
 		EditorWidgets.Template.Dialog("Choose File", storageDialogTemplate,{
 			filelist: function(root){
@@ -92,13 +99,13 @@ var EditorWidgets
 		});
 	}
 	storageDialog.label = "Browser Storage";
-	
+
 	function LocalFile(loc,exp,success,error){ (LocalFile.sources.hasOwnProperty(loc)?LocalFile.sources[loc]:fileDialog)(exp,success,error); }
 	LocalFile.sources = {
 		file: fileDialog,
 		storage: storageDialog
 	};
-	
+
 	if(Save){
 		Save.targets.file = saveFile;
 		Save.targets.storage = saveStorage;
