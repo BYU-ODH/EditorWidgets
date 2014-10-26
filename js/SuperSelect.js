@@ -2,7 +2,7 @@
 	if(typeof window.EditorWidgets !== 'object'){
 		window.EditorWidgets = {};
 	}
-	
+
 	EditorWidgets.SuperSelect = Ractive.extend({
 		template: '<div style="display:inline-block;position:relative;">\
 			<select style="display:none;" name="{{id}}" id="{{id}}" multiple="{{multiple}}">\
@@ -49,10 +49,20 @@
 			}
 		},
 		init: function(options){
-			var r = this,
-				popup = this.find('.superselectPopup'),
-				select = this.find('select');
-			
+            var r = this,
+                popup = this.find('.superselectPopup'),
+                superSel = this.find('.superselect .btn'),
+                select = this.find('select'),
+                resizeEvt = function(){
+                    var bodyRect = document.body.getBoundingClientRect(),
+                        elemRect = superSel.getBoundingClientRect(),
+                        offsetTop = (elemRect.top + 45) - bodyRect.top,
+                        offsetLeft = elemRect.left - bodyRect.left;
+                    popup.style.top = offsetTop + "px";
+                    popup.style.left = offsetLeft + "px";
+                };
+            popup.parentNode.removeChild(popup);
+            document.body.appendChild(popup);
 			this.set('open',false);
 			this.on('clickpopup',function(e){ e.original.stopPropagation(); });
 			this.on('open',function(e) {
@@ -61,9 +71,8 @@
 				if(this.data.open){
 					this.set('open', false);
 				}else{
-					popup.style.top = select.offsetTop + 45;
-					popup.style.left = select.offsetLeft + select.offsetWidth - 280;
 					this.set('open', true);
+                    resizeEvt();
 				}
 				return false;
 			});
@@ -81,12 +90,13 @@
 					select.value = optval;
 					this.set('selection',(sels[0] === optval)?[]:[optval]);
 				}
+                resizeEvt();
 			});
-			
+            window.addEventListener("resize", function(){ if (r.data.open) resizeEvt(); }, false);
 			window.addEventListener("click", function(){ r.set('open',false); }, false);
 			document.addEventListener("keyup", function(e) {
 				if (e.keyCode === 27) { r.set('open',false); }
-			});	
+            });
 		}
 	});
 }());
