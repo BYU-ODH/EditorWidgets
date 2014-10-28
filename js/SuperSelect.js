@@ -53,6 +53,24 @@
                 popup = this.find('.superselectPopup'),
                 superSel = this.find('.superselect .btn'),
                 select = this.find('select'),
+                modalId = this.data.modalId ? this.data.modalId : false,
+                resizeEvt;
+
+            // Allow the popup to pop out of whatever element it is in to reduce cliping
+            popup.parentNode.removeChild(popup);
+            if (modalId){
+            // modals don't allow selection of input elements outside of modal
+                document.getElementById(modalId).appendChild(popup);
+                resizeEvt = function(){
+                    var bodyRect = document.getElementById(modalId).getBoundingClientRect(),
+                        elemRect = superSel.getBoundingClientRect(),
+                        offsetTop = (elemRect.top + 45) - bodyRect.top,
+                        offsetLeft = elemRect.left - bodyRect.left;
+                    popup.style.top = offsetTop + "px";
+                    popup.style.left = offsetLeft + "px";
+                };
+            } else {
+                document.body.appendChild(popup);
                 resizeEvt = function(){
                     var bodyRect = document.body.getBoundingClientRect(),
                         elemRect = superSel.getBoundingClientRect(),
@@ -61,8 +79,8 @@
                     popup.style.top = offsetTop + "px";
                     popup.style.left = offsetLeft + "px";
                 };
-            popup.parentNode.removeChild(popup);
-            document.body.appendChild(popup);
+            }
+
 			this.set('open',false);
 			this.on('clickpopup',function(e){ e.original.stopPropagation(); });
 			this.on('open',function(e) {
