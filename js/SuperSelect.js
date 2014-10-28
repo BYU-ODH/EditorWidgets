@@ -20,6 +20,11 @@
 						</span>\
 					{{/checkSelected}}\
 				{{/options}}\
+				{{#showDefault}}\
+						<span class="badge badge-info pad-right-low">\
+							{{defaultValue.text}}\
+						</span>\
+				{{/showDefault}}\
 				{{^selection.length}}<span>Nothing selected</span>{{/selection.length}}\
 				</span>\
 				{{^(button === "left")}}<div>\
@@ -46,13 +51,16 @@
 			filter: function(str,text){ return text.toLowerCase().indexOf(str.toLowerCase()) > -1; },
 			checkSelected: function(optval,selval){
 				return ~selval.indexOf(optval);
-			}
+			},
+			showDefault: false
 		},
 		init: function(options){
             var r = this,
                 popup = this.find('.superselectPopup'),
                 superSel = this.find('.superselect .btn'),
                 select = this.find('select'),
+				defaultExists = (this.data.defaultValue instanceof Object),
+				defval = defaultExists ? this.data.defaultValue : null,
                 modalId = this.data.modalId ? this.data.modalId : false,
                 resizeEvt;
 
@@ -80,7 +88,14 @@
                     popup.style.left = offsetLeft + "px";
                 };
             }
-
+			// If the default value is already in the selection, move it to the front
+			if (defaultExists) {
+				var s = this.data.selection;
+				if (~(s.indexOf(defval.value))) { s.splice(s, 1); }
+				s.unshift(defval.value);
+			}
+			
+			this.set('showDefault', defaultExists);
 			this.set('open',false);
 			this.on('clickpopup',function(e){ e.original.stopPropagation(); });
 			this.on('open',function(e) {
@@ -101,12 +116,24 @@
 				if(this.data.multiple){
 					if(selopt.selected){
 						sels.splice(sels.indexOf(optval),1);
+						if (defaultExists && sels.length === 0) {
+							sels.push(defval.value);
+							this.set('showDefault', true);
+						}
 					}else{
 						sels.push(optval);
+						if (defaultExists && sels[0] === defval.value) {
+							sels.splice(0,1);
+							this.set('showDefault', false);
+						}
 					}
 				}else{
 					select.value = optval;
-					this.set('selection',(sels[0] === optval)?[]:[optval]);
+					if (defaultExists) {
+						this.set('selection',(sels[0] === optval)?[defval.value]:[optval]);
+					} else {
+						this.set('selection',(sels[0] === optval)?[]:[optval]);
+					}
 				}
                 resizeEvt();
 			});
