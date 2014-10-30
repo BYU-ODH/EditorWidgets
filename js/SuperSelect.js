@@ -7,6 +7,7 @@
 		template: '<div style="display:inline-block;position:relative;">\
 			<select style="display:none;" name="{{id}}" id="{{id}}" multiple="{{multiple}}">\
 				{{#options}}<option value="{{.value}}" selected="{{checkSelected(.value, selection)}}"></option>{{/options}}\
+				{{#defaultValue}}<option value="{{.value}}" selected="{{showDefault}}"></option>{{/defaultValue}}\
 			</select>\
 			<div class="superselect">\
 				{{#(button === "left")}}<div>\
@@ -55,47 +56,47 @@
 			showDefault: false
 		},
 		init: function(options){
-            var r = this,
-                popup = this.find('.superselectPopup'),
-                superSel = this.find('.superselect .btn'),
-                select = this.find('select'),
+			var r = this,
+				popup = this.find('.superselectPopup'),
+				superSel = this.find('.superselect .btn'),
+				select = this.find('select'),
 				defaultExists = (this.data.defaultValue instanceof Object),
 				defval = defaultExists ? this.data.defaultValue : null,
-                modalId = this.data.modalId ? this.data.modalId : false,
-                resizeEvt;
+				modalId = this.data.modalId ? this.data.modalId : false,
+				resizeEvt;
 
-            // Allow the popup to pop out of whatever element it is in to reduce cliping
-            popup.parentNode.removeChild(popup);
-            if (modalId){
-            // modals don't allow selection of input elements outside of modal
-                document.getElementById(modalId).appendChild(popup);
-                resizeEvt = function(){
-                    var bodyRect = document.getElementById(modalId).getBoundingClientRect(),
-                        elemRect = superSel.getBoundingClientRect(),
-                        offsetTop = (elemRect.top + 45) - bodyRect.top,
-                        offsetLeft = elemRect.left - bodyRect.left;
-                    popup.style.top = offsetTop + "px";
-                    popup.style.left = offsetLeft + "px";
-                };
-            } else {
-                document.body.appendChild(popup);
-                resizeEvt = function(){
-                    var bodyRect = document.body.getBoundingClientRect(),
-                        elemRect = superSel.getBoundingClientRect(),
-                        offsetTop = (elemRect.top + 45) - bodyRect.top,
-                        offsetLeft = elemRect.left - bodyRect.left;
-                    popup.style.top = offsetTop + "px";
-                    popup.style.left = offsetLeft + "px";
-                };
-            }
-			// If the default value is already in the selection, move it to the front
-			if (defaultExists) {
-				var s = this.data.selection;
-				if (~(s.indexOf(defval.value))) { s.splice(s, 1); }
-				s.unshift(defval.value);
+			// Allow the popup to pop out of whatever element it is in to reduce cliping
+			popup.parentNode.removeChild(popup);
+			if (modalId){
+			// modals don't allow selection of input elements outside of modal
+				document.getElementById(modalId).appendChild(popup);
+				resizeEvt = function(){
+					var bodyRect = document.getElementById(modalId).getBoundingClientRect(),
+						elemRect = superSel.getBoundingClientRect(),
+						offsetTop = (elemRect.top + 45) - bodyRect.top,
+						offsetLeft = elemRect.left - bodyRect.left;
+					popup.style.top = offsetTop + "px";
+					popup.style.left = offsetLeft + "px";
+				};
+			} else {
+				document.body.appendChild(popup);
+				resizeEvt = function(){
+					var bodyRect = document.body.getBoundingClientRect(),
+						elemRect = superSel.getBoundingClientRect(),
+						offsetTop = (elemRect.top + 45) - bodyRect.top,
+						offsetLeft = elemRect.left - bodyRect.left;
+					popup.style.top = offsetTop + "px";
+					popup.style.left = offsetLeft + "px";
+				};
 			}
-			
-			this.set('showDefault', defaultExists);
+			this.set('showDefault', (defaultExists && !(this.data.selection.length)));
+			if (this.get('showDefault')){
+				this.set('selection',[defval.value]);
+			} else if (defaultExists){
+				if (~this.data.selection.indexOf(defval.value))
+					this.set('showDefault', true);
+			}
+
 			this.set('open',false);
 			this.on('clickpopup',function(e){ e.original.stopPropagation(); });
 			this.on('open',function(e) {
@@ -105,7 +106,7 @@
 					this.set('open', false);
 				}else{
 					this.set('open', true);
-                    resizeEvt();
+					resizeEvt();
 				}
 				return false;
 			});
@@ -130,18 +131,24 @@
 				}else{
 					select.value = optval;
 					if (defaultExists) {
-						this.set('selection',(sels[0] === optval)?[defval.value]:[optval]);
+						if (sels[0] === optval){
+							this.set('selection', [defval.value]);
+							this.set('showDefault', true);
+						} else {
+							this.set('selection', [optval]);
+							this.set('showDefault', false);
+						}
 					} else {
 						this.set('selection',(sels[0] === optval)?[]:[optval]);
 					}
 				}
-                resizeEvt();
+				resizeEvt();
 			});
-            window.addEventListener("resize", function(){ if (r.data.open) resizeEvt(); }, false);
+			window.addEventListener("resize", function(){ if (r.data.open) resizeEvt(); }, false);
 			window.addEventListener("click", function(){ r.set('open',false); }, false);
 			document.addEventListener("keyup", function(e) {
 				if (e.keyCode === 27) { r.set('open',false); }
-            });
+			});
 		}
 	});
 }());
