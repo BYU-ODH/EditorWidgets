@@ -62,13 +62,20 @@
 				select = this.find('select'),
 				defaultExists = (this.data.defaultValue instanceof Object),
 				defval = defaultExists ? this.data.defaultValue : null,
-				modalId = this.data.modalId ? this.data.modalId : false,
+				modalId = this.data.modalId,
 				resizeEvt;
 
 			// Allow the popup to pop out of whatever element it is in to reduce cliping
 			popup.parentNode.removeChild(popup);
+
+			// Check to see if the modal exists
+			// Do this because some ractive elements are created without being used,
+			// so the modals don't actually exist. So its just safer to check if the
+			// modal exists first.
+			if (!document.querySelectorAll("#" + modalId).length) { modalId = false; }
+
 			if (modalId){
-			// modals don't allow selection of input elements outside of modal
+				// Modals don't allow selection of input elements outside of modal
 				document.getElementById(modalId).appendChild(popup);
 				resizeEvt = function(){
 					var bodyRect = document.getElementById(modalId).getBoundingClientRect(),
