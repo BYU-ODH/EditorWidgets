@@ -3,17 +3,7 @@ var EditorWidgets
 	var Save = EditorWidgets.Save, saveFile,
 		storageDialogTemplate = '<div data-template-key="filelist" style="padding:0 20px 20px 20px;min-width:150px;max-height: 150px;overflow: auto;"></div>';
 
-	saveFile = (navigator.userAgent.indexOf("Firefox")!==-1)?(function(fdata,target,success,error){
-		try{
-			fdata.forEach(function(fobj){
-				window.open("data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data),'_blank');
-			});
-		}catch(e){
-			if(typeof error === 'function'){ error(e); }
-			return;
-		}
-		if(typeof success === 'function'){ success(fdata,target); }
-	}):(function(){
+	saveFile = (function(){
 		var link = document.createElement('a');
 		link.target = "_blank";
 		return function(fdata,target,success,error){
