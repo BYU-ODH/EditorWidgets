@@ -9,9 +9,17 @@ var EditorWidgets
 		return function(fdata,target,success,error){
 			try{
 				fdata.forEach(function(fobj){
+					var evt = document.createEvent("MouseEvents");
+					evt.initMouseEvent("click",
+						false, false, //bubble, cancel
+						window, 1, //view, detail (click count)
+						0,0,0,0, //screen X, Y, client X, Y
+						false,false,false,false, //ctrl, alt, shift, meta
+						0, null //button, relatedTarget
+					);
 					link.download = fobj.name;
 					link.href = "data:"+fobj.mime+";charset=UTF-8,"+encodeURIComponent(fobj.data);
-					link.dispatchEvent(new MouseEvent('click'));
+					link.dispatchEvent(evt);
 				});
 			}catch(e){
 				if(typeof error === 'function'){ error(e); }
