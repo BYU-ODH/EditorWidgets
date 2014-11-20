@@ -128,9 +128,9 @@
 					saveIndices: {}
 				};
 			}else if(loc === void 0){
-				filemap[file].saveIndex = -1;
+				filemap[fname].saveIndex = -1;
 			}else{
-				filemap[file].saveIndices[loc] = -1;
+				filemap[fname].saveIndices[loc] = -1;
 			}
 		};
 		
