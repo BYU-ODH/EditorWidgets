@@ -114,6 +114,7 @@
 				}else{
 					this.set('open', true);
 					resizeEvt();
+					this.find('input.search-query').focus();
 				}
 				return false;
 			});
