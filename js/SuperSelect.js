@@ -136,7 +136,7 @@
 							this.set('showDefault', false);
 						}
 					}
-				}else{
+				} else {
 					select.value = optval;
 					if (defaultExists) {
 						if (sels[0] === optval){
@@ -147,7 +147,12 @@
 							this.set('showDefault', false);
 						}
 					} else {
-						this.set('selection',(sels[0] === optval)?[]:[optval]);
+						if (sels[0] === optval) {
+							this.set('selection',[]);
+						} else {
+							this.set('selection',[optval]);
+							r.set('open', false);
+						}
 					}
 				}
 				resizeEvt();
