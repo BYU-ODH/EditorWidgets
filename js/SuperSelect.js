@@ -138,22 +138,15 @@
 					}
 				} else {
 					select.value = optval;
-					if (defaultExists) {
-						if (sels[0] === optval){
-							this.set('selection', [defval.value]);
-							this.set('showDefault', true);
-						} else {
-							this.set('selection', [optval]);
-							this.set('showDefault', false);
-						}
+					if(sels[0] === optval){
+						if(!defaultExists){ return; }
+						this.set('selection', [defval.value]);
+						this.set('showDefault', true);
 					} else {
-						if (sels[0] === optval) {
-							this.set('selection',[]);
-						} else {
-							this.set('selection',[optval]);
-							r.set('open', false);
-						}
+						this.set('selection', [optval]);
+						this.set('showDefault', false);
 					}
+					this.set('open', false);
 				}
 				resizeEvt();
 			});
