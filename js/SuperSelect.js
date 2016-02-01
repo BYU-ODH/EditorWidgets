@@ -11,13 +11,13 @@
 			</select>\
 			<div class="superselect">\
 				{{#(button === "left")}}<div>\
-					<button class="btn" proxy-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
+					<button class="btn" on-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
 				</div>{{/button}}\
 				<span>\
 				{{#options:i}}\
 					{{#checkSelected(.value,selection)}}\
 						<span class="badge badge-info pad-right-low">\
-							{{.text}} {{#multiple}}<span style="color: white; cursor: pointer;" proxy-tap="select:{{i}}">×</span>{{/multiple}}\
+							{{.text}} {{#multiple}}<span style="color: white; cursor: pointer;" on-tap="select:{{i}}">×</span>{{/multiple}}\
 						</span>\
 					{{/checkSelected}}\
 				{{/options}}\
@@ -29,10 +29,10 @@
 				{{^selection.length}}<span>Nothing selected</span>{{/selection.length}}\
 				</span>\
 				{{^(button === "left")}}<div>\
-					<button class="btn" proxy-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
+					<button class="btn" on-tap="open"><i class="{{icon}}"></i> {{text}}</button>\
 				</div>{{/button}}\
 			</div>\
-			<div class="superselectPopup {{(button === "left"?"left":"right")}}" style="display:{{open?"block":"none"}};" proxy-tap="clickpopup">\
+			<div class="superselectPopup {{(button === "left"?"left":"right")}}" style="display:{{open?"block":"none"}};" on-tap="clickpopup">\
 				<div class="point"></div>\
 				<div class="point"></div>\
 				<div>\
@@ -41,7 +41,7 @@
 				<div class="optionListing">\
 					{{#options:i}}\
 					{{#filter(filterstr,.text)}}\
-					<div class="{{checkSelected(.value,selection)?"option selected":"option"}}" proxy-tap="select:{{i}}"><div class="check"></div>{{.text}}</div>\
+					<div class="{{checkSelected(.value,selection)?"option selected":"option"}}" on-tap="select:{{i}}"><div class="check"></div>{{.text}}</div>\
 					{{/filter}}\
 					{{/options}}\
 				</div>\
@@ -55,14 +55,14 @@
 			},
 			showDefault: false
 		},
-		init: function(options){
+		onrender: function(options){
 			var r = this,
 				popup = this.find('.superselectPopup'),
 				superSel = this.find('.superselect .btn'),
 				select = this.find('select'),
-				defaultExists = (this.data.defaultValue instanceof Object),
-				defval = defaultExists ? this.data.defaultValue : null,
-				modalId = this.data.modalId,
+				defval = this.get("defaultValue"),
+				defaultExists = !!defval,
+				modalId = this.get("modalId"),
 				resizeEvt;
 
 			// Allow the popup to pop out of whatever element it is in to reduce cliping
@@ -96,11 +96,11 @@
 					popup.style.left = offsetLeft + "px";
 				};
 			}
-			this.set('showDefault', (defaultExists && !(this.data.selection.length)));
+			this.set('showDefault', (defaultExists && !(this.get("selection").length)));
 			if (this.get('showDefault')){
 				this.set('selection',[defval.value]);
 			} else if (defaultExists){
-				if (~this.data.selection.indexOf(defval.value))
+				if (~this.get("selection").indexOf(defval.value))
 					this.set('showDefault', true);
 			}
 
@@ -109,7 +109,7 @@
 			this.on('open',function(e) {
 				e.original.stopPropagation();
 				e.original.preventDefault();
-				if(this.data.open){
+				if(this.get("open")){
 					this.set('open', false);
 				}else{
 					this.set('open', true);
@@ -119,10 +119,10 @@
 				return false;
 			});
 			this.on('select',function(e,which){
-				var sels = this.data.selection,
+				var sels = this.get("selection"),
 					selopt = select.options[which],
-					optval = this.data.options[which].value;
-				if(this.data.multiple){
+					optval = this.get("options")[which].value;
+				if(this.get("multiple")){
 					if(selopt.selected){
 						sels.splice(sels.indexOf(optval),1);
 						if (defaultExists && sels.length === 0) {
@@ -150,7 +150,7 @@
 				}
 				resizeEvt();
 			});
-			window.addEventListener("resize", function(){ if (r.data.open) resizeEvt(); }, false);
+			window.addEventListener("resize", function(){ if (r.get("open")) resizeEvt(); }, false);
 			window.addEventListener("click", function(){ r.set('open',false); }, false);
 			document.addEventListener("keyup", function(e) {
 				if (e.keyCode === 27) { r.set('open',false); }
