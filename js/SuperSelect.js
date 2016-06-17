@@ -40,8 +40,11 @@
 				</div>\
 				<div class="optionListing">\
 					{{#options:i}}\
-					{{#filter(filterstr,.text)}}\
-					<div class="{{checkSelected(.value,selection)?"option selected":"option"}}" on-tap="select:{{i}}"><div class="check"></div>{{.text}}</div>\
+					{{#filter(filterstr,.text,.desc)}}\
+					<div style="clear: both;" class="{{checkSelected(.value,selection)?"option selected":"option"}}" on-tap="select:{{i}}">\
+						<span style="text-align:left;"><div class="check"></div>{{.text}}</span>\
+							{{#desc}}<span style="float: right;">{{.desc}}</span>{{/desc}}\
+					</div>\
 					{{/filter}}\
 					{{/options}}\
 				</div>\
@@ -49,7 +52,10 @@
 		</div>',
 		data: {
 			filterstr: "",
-			filter: function(str,text){ return text.toLowerCase().indexOf(str.toLowerCase()) > -1; },
+			filter: function(str,text,desc){
+				return	text.toLowerCase().indexOf(str.toLowerCase()) > -1 ||
+						desc.toLowerCase().indexOf(str.toLowerCase()) > -1 ;
+			},
 			checkSelected: function(optval,selval){
 				return ~selval.indexOf(optval);
 			},
