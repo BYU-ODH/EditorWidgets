@@ -57,7 +57,7 @@
 					t = t?""+t:"Select";
 					if(text === t){ return t; }
 					text = t;
-					
+
 					btn = leftbtn.childNodes[0];
 					btn.replaceChild(document.createTextNode(text),btn.childNodes[1]);
 					btn = rightbtn.childNodes[0];
@@ -73,7 +73,7 @@
 					i = ""+i;
 					if(icon === i){ return i; }
 					icon = i;
-					
+
 					leftbtn.childNodes[0].childNodes[0].className = icon;
 					rightbtn.childNodes[0].childNodes[0].className = icon;
 
@@ -123,6 +123,9 @@
 					}
 
 					this.emit("defaultchange");
+					if(value.length === 0 && defOpt){
+						this.emit("valuechange");
+					}
 					return defOpt;
 				}
 			},
@@ -412,6 +415,10 @@
 			if(e.keyCode === 27){ that.open = false; }
 		},false);
 
+		if(value.length === 0 && this.value.length > 0){
+			setTimeout(function(){ that.emit("valuechange"); },0);
+		}
+
 		function updateValue(){
 			value = options
 					.filter(function(o){ return o.selected; })
@@ -552,63 +559,7 @@
 				var ss = new SuperSelect({
 					target: this.find('span'),
 					modal: this.get("modal")
-				}), setting = false, that = this;
-
-				//Ractive to SuperSelect bindings
-				this.observe('id',function(id){
-					if(setting){ return; }
-					setting = true;
-					ss.id = id;
-					setting = false;
-				});
-				this.observe('name',function(name){
-					if(setting){ return; }
-					setting = true;
-					ss.name = name;
-					setting = false;
-				});
-				this.observe('options',function(opts){
-					if(setting){ return; }
-					setting = true;
-					ss.options = opts;
-					setting = false;
-				});
-				this.observe('defaultOption',function(dopt){
-					if(setting){ return; }
-					setting = true;
-					ss.defaultOption = dopt;
-					setting = false;
-				});
-				this.observe('multiple',function(m){
-					if(setting){ return; }
-					setting = true;
-					ss.multiple = m;
-					setting = false;
-				});
-				this.observe('value',function(v){
-					if(setting){ return; }
-					setting = true;
-					ss.value = v;
-					setting = false;
-				});
-				this.observe('text',function(t){
-					if(setting){ return; }
-					setting = true;
-					ss.text = t;
-					setting = false;
-				});
-				this.observe('icon',function(i){
-					if(setting){ return; }
-					setting = true;
-					ss.icon = i;
-					setting = false;
-				});
-				this.observe('button',function(b){
-					if(setting){ return; }
-					setting = true;
-					ss.button = b;
-					setting = false;
-				});
+				}), setvalue = false, setting = false, that = this;
 
 				//SuperSelect to Ractive bindings
 				ss.addEventListener('idchange',function(){
@@ -642,10 +593,10 @@
 					setting = false;
 				});
 				ss.addEventListener('valuechange',function(){
-					if(setting){ return; }
-					setting = true;
+					if(setvalue){ return; }
+					setvalue = true;
 					that.set("value", ss.value);
-					setting = false;
+					setvalue = false;
 				});
 				ss.addEventListener('textchange',function(){
 					if(setting){ return; }
@@ -663,6 +614,62 @@
 					if(setting){ return; }
 					setting = true;
 					that.set("button", ss.button);
+					setting = false;
+				});
+
+				//Ractive to SuperSelect bindings
+				this.observe('id',function(id){
+					if(setting){ return; }
+					setting = true;
+					ss.id = id;
+					setting = false;
+				});
+				this.observe('name',function(name){
+					if(setting){ return; }
+					setting = true;
+					ss.name = name;
+					setting = false;
+				});
+				this.observe('options',function(opts){
+					if(setting){ return; }
+					setting = true;
+					ss.options = opts;
+					setting = false;
+				});
+				this.observe('defaultOption',function(dopt){
+					if(setting){ return; }
+					setting = true;
+					ss.defaultOption = dopt;
+					setting = false;
+				});
+				this.observe('multiple',function(m){
+					if(setting){ return; }
+					setting = true;
+					ss.multiple = m;
+					setting = false;
+				});
+				this.observe('value',function(v){
+					if(setvalue){ return; }
+					setvalue = true;
+					ss.value = v;
+					setvalue = false;
+				});
+				this.observe('text',function(t){
+					if(setting){ return; }
+					setting = true;
+					ss.text = t;
+					setting = false;
+				});
+				this.observe('icon',function(i){
+					if(setting){ return; }
+					setting = true;
+					ss.icon = i;
+					setting = false;
+				});
+				this.observe('button',function(b){
+					if(setting){ return; }
+					setting = true;
+					ss.button = b;
 					setting = false;
 				});
 			}
