@@ -306,9 +306,6 @@
 			}
 		});
 
-		main.style.display = "inline-block";
-		main.style.position = "relative";
-
 		target = (args.target||args.el);
 		target = target instanceof Node?
 			target:document.getElementById(target);
