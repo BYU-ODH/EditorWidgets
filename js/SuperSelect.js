@@ -555,7 +555,7 @@
 	if(window.Ractive){
 		Ractive.components.SuperSelect = Ractive.extend({
 			template: "<span></span>",
-			onrender(){
+			onrender: function() {
 				var ss = new SuperSelect({
 					target: this.find('span'),
 					modal: this.get("modal")
