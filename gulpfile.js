@@ -11,8 +11,8 @@ const JS_BUILD_DIR = `${BUILD_DIR}js/`
 const CSS_DIR = 'css/'
 const JS_DIR = 'js/'
 
-const PLAYER_JS = 'superselect.min.js'
-const PLAYER_CSS = 'superselect.min.css'
+const PLAYER_JS = 'SuperSelect.min.js'
+const PLAYER_CSS = 'SuperSelect.min.css'
 
 gulp.task('playercss', function(){
   return gulp.src(player_css, {base: CSS_DIR})
