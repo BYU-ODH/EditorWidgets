@@ -1,26 +1,20 @@
 {
-  "name": "yvideojs",
+  "name": "EditorWidgets",
   "version": "1.0.0",
-  "description": "yvideo libraries and plugins",
-  "main": "js/Ayamel.js",
-  "directories": {
-    "example": "examples",
-    "test": "test"
-  },
+  "description": "Widgets used in the yvideo-client application",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "version": "node version.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BYU-ODH/yvideojs.git"
+    "url": "git+https://github.com/BYU-ODH/EditorWidgets.git"
   },
   "author": "",
-  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BYU-ODH/yvideojs/issues"
+    "url": "https://github.com/BYU-ODH/EditorWidgets/issues"
   },
-  "homepage": "https://github.com/BYU-ODH/yvideojs#readme",
+  "homepage": "https://github.com/BYU-ODH/EditorWidgets#readme",
   "dependencies": {
     "del": "^3.0.0",
     "gulp-concat": "^2.6.1",
