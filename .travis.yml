@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+- 8
+cache:
+  directories:
+  - node_modules
+script:
+- gulp player
+before_deploy:
+- cd build
+- tag=$(git tag --points-at $TRAVIS_COMMIT | tail -1)
+- tar cf ../$tag.tar *
+- cd ..
+- if [[ -n "$(git branch --contains $TRAVIS_COMMIT | grep master)" ]]; then prerelease=false; else prerelease=true; fi
+deploy:
+  provider: releases
+  api_key:
+    secure: AU3br5G9iSZqzxJ+jdFgtYC36pFKxamL2zj3vhgbb7USqb2f/jfXzDdVRReyp0wcdSNscFovExZZpneFsereS1juSb5sowcuuIN/Rqeq+tHA8SxgwC5kbotirESK7uDK6gvUZjK/FYk+BfCKPpxbFDPti6UoAcAmPoohdlLfC/QfhdHEQbvfGx5dbeBKtujbm3vO298bJyqmO9YnCyBo88pKkZLodJo3ORMEXYFyr0+Bmbb1vHYgsDqikI4A42xV7PNlUfs1D9FP2YOUtDakb71975oLtXBjofKUUS6B9tWOkhMkoBQo8q1Jea8s1bOaoo3Dz4YGqyaRoajH2EeX/HP9Dlp14qJftNlVR1mEYh63pS7vonLfw9zPyt3c4EyYDmu++miQUCwCmX07vg7dq4T1t+BPnUJiSXFEMwdIYxfxBQOS8Gr9jOtIEHKgKxxwtFsw5FRT1iUj/GeVw9V7BK+JWYxzoF8MWW9k9pGv1XUxI/vpcg2cd/4fN3W4lXDe3hxc8WPQIO9Y/DawF5KaBe01tDhhmJDc8zoJj8Z7/00fS/14UgMVmhUGM6bbYs8v7EcIYsZm+JdZT9QVLHzxno+GGZjTVtcbBb8phaICDNRnr1jWixl4nSppxYgASJKNPpwJ/ovXcdrUmnWdsmA6I7ast2zAd9FcsOKnD8O8u7Q=
+  file: $tag.tar
+  skip_cleanup: true
+  on:
+    tags: true
+  prerelease: $prerelease

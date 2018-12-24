@@ -1,0 +1,28 @@
+{
+  "name": "EditorWidgets",
+  "version": "1.0.0",
+  "description": "Widgets used in the yvideo-client application",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "version": "node version.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BYU-ODH/EditorWidgets.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/BYU-ODH/EditorWidgets/issues"
+  },
+  "homepage": "https://github.com/BYU-ODH/EditorWidgets#readme",
+  "dependencies": {
+    "del": "^3.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0"
+  }
+}

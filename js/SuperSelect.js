@@ -140,6 +140,9 @@
 
 					if(open){
 						resize();
+
+						// SuperSelect is (sometimes) created in modals and needs to disable their focus-stealing nature
+						$(document).off('focusin.modal');
 						filterbox.focus();
 					}
 
@@ -359,7 +362,7 @@
 		popup.appendChild(point);
 		popup.appendChild(point.cloneNode());
 
-		filterbox.className = "search-query";
+		filterbox.className = "form-control search-query";
 		filterbox.type = "text";
 
 		filterbox.addEventListener('change',filterOptions,false);
@@ -552,7 +555,7 @@
 	if(window.Ractive){
 		Ractive.components.SuperSelect = Ractive.extend({
 			template: "<span></span>",
-			onrender(){
+			onrender: function() {
 				var ss = new SuperSelect({
 					target: this.find('span'),
 					modal: this.get("modal")
