@@ -11,22 +11,28 @@ const JS_BUILD_DIR = `${BUILD_DIR}js/`
 const CSS_DIR = 'css/'
 const JS_DIR = 'js/'
 
-const PLAYER_JS = 'SuperSelect.min.js'
-const PLAYER_CSS = 'SuperSelect.min.css'
+const SUPERSELECT_JS = 'SuperSelect.min.js'
+const SUPERSELECT_CSS = 'SuperSelect.min.css'
 
-gulp.task('playercss', function(){
-  return gulp.src(player_css, {base: CSS_DIR})
-    .pipe(concat(PLAYER_CSS))
+const superselect_css = [
+  "css/SuperSelect.css"
+]
+const superselect_js = [
+  "js/SuperSelect.js",
+  "js/*.js"
+]
+
+gulp.task('superselectcss', function(){
+  return gulp.src(superselect_css, {base: CSS_DIR})
+    .pipe(concat(SUPERSELECT_CSS))
     .pipe(minifyCSS())
     .pipe(gulp.dest(CSS_BUILD_DIR))
 });
 
-gulp.task('playerjs', function(){
-  return gulp.src(player_scripts, {base: JS_DIR})
-    .pipe(sourcemaps.init())
-    .pipe(concat(PLAYER_JS))
+gulp.task('superselectjs', function(){
+  return gulp.src(superselect_js, {base: JS_DIR})
+    .pipe(concat(SUPERSELECT_JS))
     .pipe(uglify())
-    .pipe(sourcemaps.write())
     .pipe(gulp.dest(JS_BUILD_DIR))
 });
 
@@ -34,9 +40,5 @@ gulp.task('clean', function() {
   return del([BUILD_DIR])
 })
 
-gulp.task('player', gulp.series('playerjs', 'playercss'))
-gulp.task('default', gulp.series('player'))
-
-const player_css = ["css/SuperSelect.css"]
-
-const player_scripts = ["js/SuperSelect.js"]
+gulp.task('superselect', gulp.series('superselectjs', 'superselectcss'))
+gulp.task('default', gulp.series('superselect'))
