@@ -137,7 +137,7 @@ function SuperSelect(args){
 					resize();
 
 					// SuperSelect is (sometimes) created in modals and needs to disable their focus-stealing nature
-					// $(document).off('focusin.modal');
+					$(document).off('focusin.modal');
 					filterbox.focus();
 				}
 
